@@ -8,9 +8,9 @@ R-code repository for analysis of WCT data
 - [ ] Check model assumptions, and clean up hypothesis tests
 - [ ] Better description of likelihood ratio and goodness of fit test
 
-- [ ] Report findings - Term paper
-- [ ] Presentation....Not!
+- [ ] Report findings - Final Term Paper
+- [x] Presentation....Nope!
 
 ----------
 
-**[Setup Instructions](http://psu-envstats.github.io/GitHub-for-RStudio) for Group Project using GitHub and RStudio**, or this [link](https://github.com/PSU-Env/GitHub-for-RStudio) that also has helpful images. 
+**[Setup Instructions](https://github.com/PSU-Env/GitHub-for-RStudio) for Group Project using GitHub and RStudio**, or this [link](https://github.com/PSU-Env/GitHub-for-RStudio) that also has helpful images. 
