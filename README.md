@@ -13,4 +13,4 @@ R-code repository for analysis of WCT data
 
 ----------
 
-**[Setup Instructions](http://psu-envstats.github.io/GitHub-for-RStudio) for Group Project using GitHub and RStudio**, or this [link](https://github.com/PSU-EnvStats/GitHub-for-RStudio) that also has helpful images. 
+**[Setup Instructions](http://psu-envstats.github.io/GitHub-for-RStudio) for Group Project using GitHub and RStudio**, or this [link](https://github.com/PSU-Env/GitHub-for-RStudio) that also has helpful images. 
