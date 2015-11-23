@@ -141,12 +141,13 @@ plot(WID_m,IWCT)
 lines(xv,yv,col="red")
 
 ### Confusion table - Lect 17 CART & Random Forest
+# -------------------------------------
 ## Slide 12:13,15
 dim(dt)
 s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))
 table(s)
 library(rpart)
-ct.t <- rpart(as.factor(IWCT)~.,method="class",data=dt[s==1,])
+ct.t <- rpart(as.factor(IWCT)~IWCT~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP,method="class",data=dt[s==1,])
 plot(ct.t)
 text(ct.t, use.n=TRUE)
 summary(ct.t)
