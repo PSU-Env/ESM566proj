@@ -3,8 +3,8 @@
 #### GLOBAL OPTIONS ####
 setwd("D:/R/ESM566Proj")
 data <- read.csv("wct.csv")
-op <- par(mfrow=c(1,1), xpd=NA) # set the default plot grid to 1X1
-par(xpd = NA) # set default clip region based on logical value. If TRUE, clipped to figure region, if False, clipped to plot region.
+op <- par(mfrow=c(1,1), xpd=NA) # set the default plot grid to 1X1, &set default clip region based on logical value. 
+## If TRUE, clipped to figure region, if False, clipped to plot region.
 require(dplyr) # require is same as library, loads package
 source("cor.matrix.r")
 
@@ -17,7 +17,7 @@ ct <- na.omit(data[ ,c(6,9,11:14,19:27)])  # variables to use in logit regressio
 dt <- dplyr::filter(ct, ct$WID_m > 0, ct$DEP > 0, ct$TH > 0) # IWCT P/A=1/0
 ct$IWCT <- factor(ct$IWCT, levels = 0:1, labels = c("No CT", "CT")) # turn IWCT interger into a factor
 library(dplyr)
-wct <- dplyr::filter(ct, ct$WID_m > 0, ct$DEP > 0, ct$TH > 0) # remove habitat with zero water width and depth
+wct <- dplyr::filter(ct, ct$WID_m > 0, ct$DEP > 0, ct$TH > 0) # P/A = No CT/CT
 rm(ct)
 library(MVN) # load MVN package
 uniNorm(wct[ ,2:15], type = "SW", desc = T) # summary statistics and Shipiro-Wilks normality test
@@ -42,12 +42,12 @@ cor.matrix(wct[ ,c(1,12:15)]) # Wood
 ## Boxplots of predictors included in final model
 windows(7,7)
 par(mfrow=c(2,3))
-plot(IWCT,ACW_m, xlab="Presence", ylab="Active Channel Width (m)", col="darkgreen")
-plot(IWCT,WID_m, xlab="Presence", ylab="Wet Width (m)", col="green")
-plot(IWCT,DEP_m, xlab="Presence", ylab="Channel Depth (m)",col="lightgreen")
-plot(IWCT,LWDP, xlab="Presence", ylab="Large Wood (count)",col="brown")
-plot(IWCT,FIN, xlab="Presence", ylab="Fine Substrate (%)",col="tan")
-plot(IWCT,BLD, xlab="Presence", ylab="Boulder Substrate (%)",col="beige")
+boxplot(IWCT,ACW_m, xlab="Presence", ylab="Active Channel Width (m)", col="darkgreen")
+boxplot(IWCT,WID_m, xlab="Presence", ylab="Wet Width (m)", col="green")
+boxplot(IWCT,DEP_m, xlab="Presence", ylab="Channel Depth (m)",col="lightgreen")
+boxplot(IWCT,LWDP, xlab="Presence", ylab="Large Wood (count)",col="brown")
+boxplot(IWCT,FIN, xlab="Presence", ylab="Fine Substrate (%)",col="tan")
+boxplot(IWCT,BLD, xlab="Presence", ylab="Boulder Substrate (%)",col="beige")
 par(op)
 detach(wct)
 
@@ -85,8 +85,8 @@ modR
 summary(modR)  # Width, depth, and active channel width have a significant negative effect on WCT presence.(large habitat less likely to have CT)
 ## Also, habitat higher numbers of boulders and LWDP are more likely to have WCT.
 
-pchisq(1162-1164, 2) #  the deviance of the 9 predictor modR is higher than the full model(not good)
-pchisq(1162-1141, 2) # the 5 predictor model with interaction is a better model with less residual deviance
+pchisq(1162-1164, 8) #  the deviance of the 9 predictor modR is higher than the full model(not good)
+pchisq(1162-1141, 4) # the 5 predictor model with interaction is a better model with less residual deviance
 
 ## Variance Invlation Factor (VIF) - Test for multicolinearity: > 4-5 suggest a problem, > 10 highly likely
 library(car)
@@ -144,10 +144,10 @@ lines(xv,yv,col="red")
 # -------------------------------------
 ## Slide 12:13,15
 dim(dt)
-s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))
+s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20%.  Use 20% to validate
 table(s)
 library(rpart)
-ct.t <- rpart(as.factor(IWCT)~IWCT~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP,method="class",data=dt[s==1,])
+ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP,method="class",data=dt[s==1,])
 plot(ct.t)
 text(ct.t, use.n=TRUE)
 summary(ct.t)
@@ -156,8 +156,8 @@ tb.1 <- table(predicted=predict(ct.t,data=dt[s==1,], type="class"),
 tb.1 # Correctly classified (0-0,1-1), missclasified (0-1,1-0)
 cc <-(tb.1[1,1]+tb.1[2,2])/(sum(tb.1))
 cc # proportion correctly classified (correct classification rate)
-mcc <-1-cc  # misclassificaiton rate 
-mcc
+mc <-1-cc  # misclassificaiton rate 
+mc
 
 ## Durbin -Wattson test for autocorrelation
 library(car)
