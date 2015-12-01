@@ -82,17 +82,17 @@ step(ctlogit)
 
 ##--- Reduced Model ---
 #### varaible selection tree (no interaction) & stepwise selection methods were used
+library(rpart)
 modR <- glm(formula= IWCT~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP, binomial,data=dt)
 modR
 summary(modR) 
 
 pchisq(1162-1164, 8) #  the deviance of the 9 predictor modR is higher than the full model(not good)
 
-## Variance Invlation Factor (VIF) 
+## Variance Invlation Factor (VIF) & AIC 
 library(car)
 vif(modR)
-
-AIC(ctlogit,modR,k=2)
+AIC(ctlogit,modR,k=2) # smaller is better
 
 ####--------------------####
 ## HYPOTHESIS TEST
@@ -116,27 +116,32 @@ logLik(ctlogit)
 with(modR, null.deviance - deviance) # difference in deviance between null and modR
 with(modR, df.null - df.residual) # df
 with(modR, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE)) # p-value
-## With a chi-square of 272.0, 6 degrees of freedom, & an associated p-value of < 0.001 tells us 
+## With a chi-square of 249, 9 degrees of freedom, & an associated p-value of < 0.001 tells us 
 ## that our model as a whole fits significantly better than a null model. 
 
 ## GOODNESS OF FIT: Pseudo R^2
 1-(deviance(modR)/deviance(mod0))
 1-(deviance(ctlogit)/deviance(mod0))
 
-## ODDS RATIO COEFFICIENTS & 95% CI
-exp(cbind(IWCT = coef(modR), confint(modR)))
+## ODDS RATIO COEFFICIENTS (ORC) & 95% CI
+orc <-exp(cbind(IWCT = coef(modR), confint(modR))) 
+orc
+## The results of the ORC can be checked by simply taking the natural log of each coefficient and comparing to the
+## summary of the model output.
+##---- example ----
 ## For a one unit increase in LWDP (large wood), the odds of WCT presence (vs not present) increase 
 ## by a factor of 1.39.  Values < 1, reduce the odds, radio = 1, have no influance, and > 1 increase the odds of Y
 
 ####-----------------------####
-## inverse log prediction model
+## WCT prediction model
 ####-----------------------####
+## replace each variable (l,w,d,acw,gr,co,b,br) with observation to get predicted presence of WCT
 
-
-
-
-
-
+x <- c(5,2,.5,2.5,23,40,60,2,4)
+library(faraway)
+ilogit(orc[1,1]-orc[2,1]*(x[1])-orc[3,1]*(x[2])-orc[4,1]*(x[3])-orc[5,1]*(x[4])-
+  orc[6,1]*(x[5])-orc[7,1]*(x[6])+orc[8,1]*(x[7])-orc[9,1]*(x[8])+orc[10,1]*(x[9]))
+rm(l,w,d,acw,gr,co,b,br,lwp)
 
 
 ###############
