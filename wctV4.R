@@ -66,25 +66,25 @@ plotcp(ct.tree) # What splits are significant?
 summary(ct.tree) # model summary
 print(ct.tree) # a short summary of the summary output
 
-
 ##---- Full Model ----
 ctlogit <- glm(IWCT ~ .,data=dt, binomial) # Full model, no interaction
 ctlogit # short summary
 summary(ctlogit)
-anova(ctlogit,test="Chisq") # Chi-squared test for differenc in deviance significance. Used as a rough indicator to find good model, sig. predictors
 
-## Variance Invlation Factor (VIF) - Test for multicolinearity: > 4-5 suggest a problem, > 10 highly likely
+## Chi-squared test for differenc in deviance significance. 
+anova(ctlogit,test="Chisq") # Used as a rough indicator to find good model, sig. predictors
+
+## Variance Invlation Factor (VIF) 
 library(car)
-vif(ctlogit)
+vif(ctlogit) # Test for multicolinearity: > 4-5 suggest a problem, > 10 highly likely
 
 ## Variable Selection - Stepwise
 step(ctlogit)
 
 ##--- Reduced Model ---
-#### varaible selection tree (no interaction) & stepwise selection methods were used
 library(rpart)
 modR <- glm(formula= IWCT~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP, binomial,data=dt)
-modR
+modR # varaible selection tree (no interaction) & stepwise selection methods were used
 summary(modR) 
 
 pchisq(1162-1164, 8) #  the deviance of the 9 predictor modR is higher than the full model(not good)
@@ -104,8 +104,8 @@ anova(ctlogit, mod0, test="Chi") # Is the slope of the full model = 0?
 anova(modR,test="Chisq")# Chi-squared test for differenc in deviance significance. 
 ## Used as a rough indicator to find/check model varaible coefficients
 
-## no p-value if model has interaction term???
 anova(ctlogit,modR, test="Chi") # Is the reduced model (modR) model significantly worse than full (ctlogit) model?
+## no p-value if model has interaction term???
 
 ## MAXIMUM LOG LIKELIHOOD (ML). it can be thought of as a chi-square value - smallest possible deviance 
 ## between the observed and predicted values (kind of like finding the best fitting line) 
@@ -136,7 +136,6 @@ orc
 ## WCT prediction model
 ####-----------------------####
 ## replace each variable (l,w,d,acw,gr,co,b,br) with observation to get predicted presence of WCT
-
 x <- c(5,2,.5,2.5,23,40,60,2,4)
 library(faraway)
 ilogit(orc[1,1]-orc[2,1]*(x[1])-orc[3,1]*(x[2])-orc[4,1]*(x[3])-orc[5,1]*(x[4])-
