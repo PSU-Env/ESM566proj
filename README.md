@@ -9,7 +9,7 @@ R-code repository for analysis of WCT data
 - [ ] Better description of likelihood ratio, ANOVA Chi^2, and goodness of fit test
 
 - [ ] Report findings - Final Term Paper
-- [x] Presentation....Nope!
+- [x] Presentation?....Nope!
 
 ----------
 

@@ -14,10 +14,10 @@ str(data) # look at the structure of the data
 summary(data)
 
 ## Variables to use in model selection
-ct <- na.omit(data[ ,c(6,9,11:14,19:27)])  # variables to use in logit regression
-dt <- dplyr::filter(ct, ct$WID_m > 0, ct$DEP > 0, ct$TH > 0) # IWCT P/A=1/0
-ct$IWCT <- factor(ct$IWCT, levels = 0:1, labels = c("No CT", "CT")) # turn IWCT interger into a factor
 library(dplyr)
+ct <- na.omit(data[ ,c(6,9,11:14,19:27)])  # variables to use in logit regression
+dt <- dplyr::filter(ct, ct$WID_m > 0, ct$DEP > 0, ct$TH > 0) # IWCT P/A=1/0 & no zero water
+ct$IWCT <- factor(ct$IWCT, levels = 0:1, labels = c("No CT", "CT")) # turn IWCT interger into a factor
 wct <- dplyr::filter(ct, ct$WID_m > 0, ct$DEP > 0, ct$TH > 0) # P/A = No CT/CT
 rm(ct)
 library(MVN) # load MVN package
@@ -52,8 +52,11 @@ boxplot(IWCT,BLD, xlab="Presence", ylab="Boulder Substrate (%)",col="beige")
 par(op)
 detach(wct)
 
+summary(wct)
+
+
 ####--- LOGISTIC REGRESSION ---####
-## Normality & Equal variance assumption not required; Predict presence of West Slope Cutthroat Trout;
+## Normality & Equal variance assumption not required; Predict presence of Westslope Cutthroat Trout;
 ## Response variable (y): IWCT
 
 ## Classification Tree Model (CART) - variable classification selection tree (for model interaction terms)
@@ -66,28 +69,28 @@ plotcp(ct.tree) # What splits are significant?
 summary(ct.tree) # model summary
 print(ct.tree) # a short summary of the summary output
 
-
 ##---- Full Model ----
 ctlogit <- glm(IWCT ~ .,data=dt, binomial) # Full model, no interaction
 ctlogit # short summary
 summary(ctlogit)
-anova(ctlogit,test="Chisq") # Chi-squared test for differenc in deviance significance. Used as a rough indicator to find good model, sig. predictors
 
-## Variance Invlation Factor (VIF) - Test for multicolinearity: > 4-5 suggest a problem, > 10 highly likely
+## Chi-squared test for differenc in deviance significance. 
+anova(ctlogit,test="Chisq") # Used as a rough indicator to find good model, sig. predictors
+
+## Variance Invlation Factor (VIF) 
 library(car)
-vif(ctlogit)
+vif(ctlogit) # Test for multicolinearity: > 4-5 suggest a problem, > 10 highly likely
 
 ## Variable Selection - Stepwise
 step(ctlogit)
 
 ##--- Reduced Model ---
-#### varaible selection tree (no interaction) & stepwise selection methods were used
 library(rpart)
-modR <- glm(formula= IWCT~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP, binomial,data=dt)
-modR
+modR <- glm(formula= IWCT~LENG_m+WID_m+DEP_m+ACW_m+GRA+BLD+BDR+LWDP, binomial,data=dt)
+modR # varaible selection tree (no interaction) & stepwise selection methods were used
 summary(modR) 
 
-pchisq(1162-1164, 8) #  the deviance of the 9 predictor modR is higher than the full model(not good)
+pchisq(1166-1166.9, 8) #  the deviance of the 9 predictor modR is higher than the full model (not ideal)
 
 ## Variance Invlation Factor (VIF) & AIC 
 library(car)
@@ -104,8 +107,8 @@ anova(ctlogit, mod0, test="Chi") # Is the slope of the full model = 0?
 anova(modR,test="Chisq")# Chi-squared test for differenc in deviance significance. 
 ## Used as a rough indicator to find/check model varaible coefficients
 
-## no p-value if model has interaction term???
 anova(ctlogit,modR, test="Chi") # Is the reduced model (modR) model significantly worse than full (ctlogit) model?
+## no p-value if model has interaction term???
 
 ## MAXIMUM LOG LIKELIHOOD (ML). it can be thought of as a chi-square value - smallest possible deviance 
 ## between the observed and predicted values (kind of like finding the best fitting line) 
@@ -132,16 +135,18 @@ orc
 ## For a one unit increase in LWDP (large wood), the odds of WCT presence (vs not present) increase 
 ## by a factor of 1.39.  Values < 1, reduce the odds, radio = 1, have no influance, and > 1 increase the odds of Y
 
-####-----------------------####
-## WCT prediction model
-####-----------------------####
-## replace each variable (l,w,d,acw,gr,co,b,br) with observation to get predicted presence of WCT
 
-x <- c(5,2,.5,2.5,23,40,60,2,4)
+####-----------------------------------------####
+## WCT prediction model (probability of presence)
+####-----------------------------------------####
+## Replace each habitat variable in the x vector (l,w,d,acw,gr,b,br,lwp) to get predicted presence of WCT
+## Where: l=length, w=weted width, d=water depth, acw=active channel width, gr=%gravel, co=%cobble, b=%boulder, br=%bedrock,& lwp=number of large wood pieces
+## Make sure to run orc above first.
 library(faraway)
+x <- c(6,2,.75,2.5,23,60,2,4)
 ilogit(orc[1,1]-orc[2,1]*(x[1])-orc[3,1]*(x[2])-orc[4,1]*(x[3])-orc[5,1]*(x[4])-
-  orc[6,1]*(x[5])-orc[7,1]*(x[6])+orc[8,1]*(x[7])-orc[9,1]*(x[8])+orc[10,1]*(x[9]))
-rm(l,w,d,acw,gr,co,b,br,lwp)
+  orc[6,1]*(x[5])+orc[7,1]*(x[6])-orc[8,1]*(x[7])+orc[9,1]*(x[8]))
+rm(x)
 
 
 ###############
@@ -164,7 +169,7 @@ dim(dt)
 s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20%.  Use 20% to validate
 table(s)
 library(rpart)
-ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + COB + BLD + BDR + LWDP,method="class",data=dt[s==1,])
+ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + BLD + BDR + LWDP,method="class",data=dt[s==1,])
 plot(ct.t)
 text(ct.t, use.n=TRUE)
 summary(ct.t)
