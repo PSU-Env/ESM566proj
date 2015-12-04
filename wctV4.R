@@ -90,7 +90,7 @@ modR <- glm(formula= IWCT~LENG_m+WID_m+DEP_m+ACW_m+GRA+BLD+BDR+LWDP, binomial,da
 modR # varaible selection tree (no interaction) & stepwise selection methods were used
 summary(modR) 
 
-pchisq(1166-1166.9, 8) #  the deviance of the 9 predictor modR is higher than the full model (not ideal)
+pchisq(1166-1166.9, 8) #  the deviance of the 8 predictor modR is higher than the full model (not ideal)
 
 ## Variance Invlation Factor (VIF) & AIC 
 library(car)
@@ -166,7 +166,7 @@ lines(xv,yv,col="red")
 # -------------------------------------------####
 ## Slide 12:13,15
 dim(dt)
-s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20%.  Use 20% to validate
+s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20 %.  Use 20% to validate
 table(s)
 library(rpart)
 ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + BLD + BDR + LWDP,method="class",data=dt[s==1,])
@@ -178,8 +178,16 @@ tb.1 <- table(predicted=predict(ct.t,data=dt[s==1,], type="class"),
 tb.1 # Correctly classified (0-0,1-1), missclasified (0-1,1-0)
 cc <-(tb.1[1,1]+tb.1[2,2])/(sum(tb.1))
 cc # proportion correctly classified (correct classification rate)
-mc <-1-cc  # misclassificaiton rate 
+mc <-(1-cc)*100  # misclassificaiton rate 
 mc
+## Lecture 17CART
+abs <- (tb.1[1,1])/(tb.1[1,1]+tb.1[2,1])*100 # proportion absent correctly classified
+abs
+prs <- (tb.1[2,2])/(tb.1[1,2]+tb.1[2,2])*100 # proportion present correctly classified
+prs # CT = 1, No CT = 0
+
+
+
 
 ####-----------------------------------####
 ## Durbin -Wattson test for autocorrelation
