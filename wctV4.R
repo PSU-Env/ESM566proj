@@ -166,16 +166,17 @@ lines(xv,yv,col="red")
 # -------------------------------------------####
 ## Slide 12:13,15
 ## Lecture 17CART
-dim(dt)
-s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20 %.  Use 20% to validate
+dim(dt) #dimentions of the data (# of observations, # of variables)
+s <- sample(2, nrow(wct), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20 %.  Use 20% to validate
+## This is a random sample, so it will be different each time it is run
 table(s)
 library(rpart)
-ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + BLD + BDR + LWDP,method="class",data=dt[s==1,])
+ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + BLD + BDR + LWDP,method="class",data=wct[s==1,])
 plot(ct.t)
 text(ct.t, use.n=TRUE)
 summary(ct.t)
-tb.1 <- table(predicted=predict(ct.t,data=dt[s==1,], type="class"),
-              observed=dt[s==1, "IWCT"])
+tb.1 <- table(predicted=predict(ct.t,data=wct[s==1,], type="class"),
+              observed=wct[s==1, "IWCT"])
 
 tb.1 # Correctly classified (0-0,1-1), missclasified (0-1,1-0)
 cc <-(tb.1[1,1]+tb.1[2,2])/(sum(tb.1))
