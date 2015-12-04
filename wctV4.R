@@ -135,13 +135,13 @@ orc
 ## For a one unit increase in LWDP (large wood), the odds of WCT presence (vs not present) increase 
 ## by a factor of 1.39.  Values < 1, reduce the odds, radio = 1, have no influance, and > 1 increase the odds of Y
 
-
 ####-----------------------------------------####
 ## WCT prediction model (probability of presence)
 ####-----------------------------------------####
 ## Replace each habitat variable in the x vector (l,w,d,acw,gr,b,br,lwp) to get predicted presence of WCT
 ## Where: l=length, w=weted width, d=water depth, acw=active channel width, gr=%gravel, co=%cobble, b=%boulder, br=%bedrock,& lwp=number of large wood pieces
 ## Make sure to run orc above first.
+
 library(faraway)
 x <- c(6,2,.75,2.5,23,60,2,4)
 ilogit(orc[1,1]-orc[2,1]*(x[1])-orc[3,1]*(x[2])-orc[4,1]*(x[3])-orc[5,1]*(x[4])-
@@ -165,6 +165,7 @@ lines(xv,yv,col="red")
 ## Confusion table - Lect 17 CART & Random Forest
 # -------------------------------------------####
 ## Slide 12:13,15
+## Lecture 17CART
 dim(dt)
 s <- sample(2, nrow(dt), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20 %.  Use 20% to validate
 table(s)
@@ -175,17 +176,16 @@ text(ct.t, use.n=TRUE)
 summary(ct.t)
 tb.1 <- table(predicted=predict(ct.t,data=dt[s==1,], type="class"),
               observed=dt[s==1, "IWCT"])
+
 tb.1 # Correctly classified (0-0,1-1), missclasified (0-1,1-0)
 cc <-(tb.1[1,1]+tb.1[2,2])/(sum(tb.1))
-cc # proportion correctly classified (correct classification rate)
-mc <-(1-cc)*100  # misclassificaiton rate 
+cc # Model proportion correctly classified (correct classification rate)
+mc <-(1-cc)*100  # Model misclassificaiton rate 
 mc
-## Lecture 17CART
 abs <- (tb.1[1,1])/(tb.1[1,1]+tb.1[2,1])*100 # proportion absent correctly classified
 abs
 prs <- (tb.1[2,2])/(tb.1[1,2]+tb.1[2,2])*100 # proportion present correctly classified
 prs # CT = 1, No CT = 0
-
 
 
 
