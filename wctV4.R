@@ -1,7 +1,6 @@
 #### Bern Romey, 01Dec15, ESM566 Term Project, Westslope Cutthroat Trout (WCT)
 
 ####--- GLOBAL OPTIONS ---####
-
 setwd("D:/R/ESM566Proj")
 data <- read.csv("wct.csv")
 op <- par(mfrow=c(1,1), xpd=NA) # set the default plot grid to 1X1, &set default clip region based on logical value. 
@@ -54,7 +53,6 @@ detach(wct)
 
 summary(wct)
 
-
 ####--- LOGISTIC REGRESSION ---####
 ## Normality & Equal variance assumption not required; Predict presence of Westslope Cutthroat Trout;
 ## Response variable (y): IWCT
@@ -75,13 +73,13 @@ ctlogit # short summary
 summary(ctlogit)
 
 ## Chi-squared test for differenc in deviance significance. 
-anova(ctlogit,test="Chisq") # Used as a rough indicator to find good model, sig. predictors
+anova(ctlogit,test="Chisq") # Used as a rough indicator to find good model, sig. predictors with slope > 0
 
 ## Variance Invlation Factor (VIF) 
 library(car)
 vif(ctlogit) # Test for multicolinearity: > 4-5 suggest a problem, > 10 highly likely
 
-## Variable Selection - Stepwise
+## Variable Selection - Stepwise; predictors with least AIC retained
 step(ctlogit)
 
 ##--- Reduced Model ---
@@ -103,14 +101,18 @@ AIC(ctlogit,modR,k=2) # smaller is better
 mod0 <- glm(formula= IWCT~1, binomial,data=dt) # null model
 mod0
 anova(ctlogit, mod0, test="Chi") # Is the slope of the full model = 0?
+anova(modR, mod0,test="Chi") # is the slope of the minimum adequate model = 0?  
+# The reduced model is nested in the full model, so it should have a significantly similar slope
 
 anova(modR,test="Chisq")# Chi-squared test for differenc in deviance significance. 
-## Used as a rough indicator to find/check model varaible coefficients
+## Used as a rough indicator to find/check model varaible coefficients.  
+## Are they significantly different from zero?
 
-anova(ctlogit,modR, test="Chi") # Is the reduced model (modR) model significantly worse than full (ctlogit) model?
+anova(ctlogit,modR, test="Chi") # Is the reduced model (modR) significantly worse than full (ctlogit) model?
+## Fail to reject if the reduced model is similar to full model, p-value > 0.05 is good.
 ## no p-value if model has interaction term???
 
-## MAXIMUM LOG LIKELIHOOD (ML). it can be thought of as a chi-square value - smallest possible deviance 
+## MAXIMUM LOG LIKELIHOOD (ML). It can be thought of as a chi-square value - smallest possible deviance 
 ## between the observed and predicted values (kind of like finding the best fitting line) 
 logLik(modR) # smaller is better
 logLik(ctlogit)
@@ -135,19 +137,6 @@ orc
 ## For a one unit increase in LWDP (large wood), the odds of WCT presence (vs not present) increase 
 ## by a factor of 1.39.  Values < 1, reduce the odds, radio = 1, have no influance, and > 1 increase the odds of Y
 
-####-----------------------------------------####
-## WCT prediction model (probability of presence)
-####-----------------------------------------####
-## Replace each habitat variable in the x vector (l,w,d,acw,gr,b,br,lwp) to get predicted presence of WCT
-## Where: l=length, w=weted width, d=water depth, acw=active channel width, gr=%gravel, co=%cobble, b=%boulder, br=%bedrock,& lwp=number of large wood pieces
-## Make sure to run orc above first.
-
-library(faraway)
-x <- c(6,2,.75,2.5,23,60,2,4)
-ilogit(orc[1,1]-orc[2,1]*(x[1])-orc[3,1]*(x[2])-orc[4,1]*(x[3])-orc[5,1]*(x[4])-
-  orc[6,1]*(x[5])+orc[7,1]*(x[6])-orc[8,1]*(x[7])+orc[9,1]*(x[8]))
-rm(x)
-
 
 ###############
 ## logit Plots
@@ -166,10 +155,10 @@ lines(xv,yv,col="red")
 # -------------------------------------------####
 ## Slide 12:13,15
 ## Lecture 17CART
-dim(dt) #dimentions of the data (# of observations, # of variables)
+dim(wct) #dimentions of the raw data (# of observations, # of variables)
 s <- sample(2, nrow(wct), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20 %.  Use 20% to validate
 ## This is a random sample, so it will be different each time it is run
-table(s)
+table(s) # 80% for developing the model, 20% to validate prediction
 library(rpart)
 ct.t <- rpart(as.factor(IWCT)~LENG_m + WID_m + DEP_m + ACW_m + GRA + BLD + BDR + LWDP,method="class",data=wct[s==1,])
 plot(ct.t)
@@ -179,14 +168,14 @@ tb.1 <- table(predicted=predict(ct.t,data=wct[s==1,], type="class"),
               observed=wct[s==1, "IWCT"])
 
 tb.1 # Correctly classified (0-0,1-1), missclasified (0-1,1-0)
-cc <-(tb.1[1,1]+tb.1[2,2])/(sum(tb.1))
-cc # Model proportion correctly classified (correct classification rate)
-mc <-(1-cc)*100  # Model misclassificaiton rate 
+cc <-(tb.1[1,1]+tb.1[2,2])/(sum(tb.1))# Model proportion correct classification rate (both CT & No CT)
+cc 
+mc <-(1-cc)*100  # Model misclassificaiton rate (both)
 mc
-abs <- (tb.1[1,1])/(tb.1[1,1]+tb.1[2,1])*100 # proportion absent correctly classified
+abs <- (tb.1[1,1])/(tb.1[1,1]+tb.1[2,1])*100 # proportion ABSENT (No CT) correctly classified
 abs
-prs <- (tb.1[2,2])/(tb.1[1,2]+tb.1[2,2])*100 # proportion present correctly classified
-prs # CT = 1, No CT = 0
+prs <- (tb.1[2,2])/(tb.1[1,2]+tb.1[2,2])*100 # proportion PRESENT (CT) correctly classified
+prs 
 
 
 
