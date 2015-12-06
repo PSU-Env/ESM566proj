@@ -157,6 +157,7 @@ lines(xv,yv,col="red")
 ## Lecture 17CART
 dim(wct) #dimentions of the raw data (# of observations, # of variables)
 s <- sample(2, nrow(wct), replace = TRUE, prob=c(0.8, 0.2))  #split sample in to 80 & 20 %.  Use 20% to validate
+# Thid judt s misclasificaiton test, not a model validation.  You would need to exclude the 20% from the original model.
 ## This is a random sample, so it will be different each time it is run
 table(s) # 80% for developing the model, 20% to validate prediction
 library(rpart)
