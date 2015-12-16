@@ -5,10 +5,10 @@
 R-code repository for analysis of WCT data
  
 - [x] Meet with group and select final model predictors
-- [ ] Check model assumptions, and clean up hypothesis tests
-- [ ] Better description of likelihood ratio, ANOVA Chi^2, and goodness of fit test
+- [x] Check model assumptions, and clean up hypothesis tests
+- [x] Better description of likelihood ratio, ANOVA Chi^2, and goodness of fit test
 
-- [ ] Report findings - Final Term Paper
+- [x] Report findings - Final Term Paper
 - [x] Presentation?....Nope!
 
 ----------
