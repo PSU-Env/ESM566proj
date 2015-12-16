@@ -1,12 +1,12 @@
-#### Bern Romey, 01Dec15, ESM566 Term Project, Westslope Cutthroat Trout (WCT)
+#### Bern Romey, 16Dec15, ESM566 Term Project, Westslope Cutthroat Trout (WCT)
 
 ####--- GLOBAL OPTIONS ---####
 setwd("D:/R/ESM566Proj")
 data <- read.csv("wct.csv")
-op <- par(mfrow=c(1,1), xpd=NA) # set the default plot grid to 1X1, &set default clip region based on logical value. 
+op <- par(mfrow=c(1,1), xpd=NA) # set the default plot grid to 1X1 & default clip region based on logical value. 
 ## If TRUE, clipped to figure region, if False, clipped to plot region.
 require(dplyr) # require is same as library, loads package
-source("cor.matrix.r")
+source("cor.matrix.r") # Sources the cor.matrix.r function for Person or Spearman correlation.
 
 ##### --- KNOW YOUR DATA --- ####
 str(data) # look at the structure of the data
@@ -135,7 +135,7 @@ orc
 ## summary of the model output.
 ##---- example ----
 ## For a one unit increase in LWDP (large wood), the odds of WCT presence (vs not present) increase 
-## by a factor of 1.39.  Values < 1, reduce the odds, radio = 1, have no influance, and > 1 increase the odds of Y
+## by a factor of 1.39.  Values < 1, reduce the odds, ratio = 1, have no influance, and > 1 increase the odds of Y
 
 
 ###############
